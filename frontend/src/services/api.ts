@@ -1,0 +1,39 @@
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import type { RootState } from '../app/store';
+
+export const api = createApi({
+  reducerPath: 'api',
+
+  baseQuery: fetchBaseQuery({
+    baseUrl: import.meta.env.VITE_API_URL,
+
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).auth.token;
+
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+
+      return headers;
+    },
+  }),
+
+  tagTypes: [
+    'User',
+    'Events',
+    'Tasks',
+    'Expenses',
+    'Guests',
+    'Invitations',
+    'Moodboards',
+    'Services',
+    'Providers',
+    'Portfolio',
+    'Reviews',
+    'Favorites',
+    'Conversations',
+    'Messages',
+  ],
+
+  endpoints: () => ({}),
+});

@@ -1,0 +1,1416 @@
+openapi: 3.0.3
+info:
+  title: YourEvent API
+  version: 1.0.0
+  description: Organizer and Provider REST API. Use Authorize with JWT token.
+servers:
+- url: http://localhost:3000/api
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Register:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum:
+          - organizer
+          - provider
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        avatar:
+          type: string
+        bio:
+          type: string
+        businessName:
+          type: string
+        workingCities:
+          type: array
+          items:
+            type: string
+    PasswordUpdate:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+    Event:
+      type: object
+      properties:
+        title:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+          format: date-time
+        city:
+          type: string
+        address:
+          type: string
+        budget:
+          type: number
+        expectedGuests:
+          type: integer
+        coverImage:
+          type: string
+        status:
+          type: string
+          enum:
+          - planning
+          - completed
+          - cancelled
+    Task:
+      type: object
+      properties:
+        title:
+          type: string
+        completed:
+          type: boolean
+        dueDate:
+          type: string
+          format: date
+    Expense:
+      type: object
+      properties:
+        title:
+          type: string
+        category:
+          type: string
+        amount:
+          type: number
+    Guest:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - invited
+          - going
+          - declined
+    Invitation:
+      type: object
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        theme:
+          type: string
+          enum:
+          - classic
+          - soft
+          - dark
+        published:
+          type: boolean
+    RSVP:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - going
+          - declined
+    RSVPUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - going
+          - declined
+    Service:
+      type: object
+      properties:
+        title:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        city:
+          type: string
+        price:
+          type: number
+        images:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+    ConversationCreate:
+      type: object
+      properties:
+        providerId:
+          type: integer
+    Message:
+      type: object
+      properties:
+        body:
+          type: string
+paths:
+  /health:
+    get:
+      tags:
+      - System
+      summary: Health check
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+  /auth/register:
+    post:
+      tags:
+      - Auth
+      summary: Register organizer or provider
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Login and receive JWT
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+  /auth/me:
+    get:
+      tags:
+      - Auth
+      summary: Current user
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /users/me:
+    patch:
+      tags:
+      - Users
+      summary: Update profile
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+  /users/me/password:
+    patch:
+      tags:
+      - Users
+      summary: Change password
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordUpdate'
+  /uploads:
+    post:
+      tags:
+      - Uploads
+      summary: Upload image
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+              required:
+              - image
+  /events:
+    get:
+      tags:
+      - Events
+      summary: My events
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Events
+      summary: Create event
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+  /events/{id}:
+    get:
+      tags:
+      - Events
+      summary: Event workspace
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    patch:
+      tags:
+      - Events
+      summary: Update event
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+    delete:
+      tags:
+      - Events
+      summary: Delete event
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+  /events/{eventId}/tasks:
+    get:
+      tags:
+      - Tasks
+      summary: List tasks
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+    post:
+      tags:
+      - Tasks
+      summary: Create tasks
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+  /events/{eventId}/tasks/{itemId}:
+    patch:
+      tags:
+      - Tasks
+      summary: Update tasks
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+      - in: path
+        name: itemId
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+    delete:
+      tags:
+      - Tasks
+      summary: Delete tasks
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+      - in: path
+        name: itemId
+        required: true
+        schema:
+          type: integer
+  /events/{eventId}/expenses:
+    get:
+      tags:
+      - Expenses
+      summary: List expenses
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+    post:
+      tags:
+      - Expenses
+      summary: Create expenses
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Expense'
+  /events/{eventId}/expenses/{itemId}:
+    patch:
+      tags:
+      - Expenses
+      summary: Update expenses
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+      - in: path
+        name: itemId
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Expense'
+    delete:
+      tags:
+      - Expenses
+      summary: Delete expenses
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+      - in: path
+        name: itemId
+        required: true
+        schema:
+          type: integer
+  /events/{eventId}/guests:
+    get:
+      tags:
+      - Guests
+      summary: List guests
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+    post:
+      tags:
+      - Guests
+      summary: Create guests
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Guest'
+  /events/{eventId}/guests/{itemId}:
+    patch:
+      tags:
+      - Guests
+      summary: Update guests
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+      - in: path
+        name: itemId
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Guest'
+    delete:
+      tags:
+      - Guests
+      summary: Delete guests
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+      - in: path
+        name: itemId
+        required: true
+        schema:
+          type: integer
+  /events/{eventId}/invitation:
+    put:
+      tags:
+      - Invitations
+      summary: Create or update invitation
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invitation'
+  /invitations/{token}:
+    get:
+      tags:
+      - Invitations
+      summary: Public published invitation
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      parameters:
+      - in: path
+        name: token
+        required: true
+        schema:
+          type: string
+  /invitations/{token}/rsvp:
+    post:
+      tags:
+      - Invitations
+      summary: Guest RSVP
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      parameters:
+      - in: path
+        name: token
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RSVP'
+  /rsvp/{responseToken}:
+    patch:
+      tags:
+      - Invitations
+      summary: Update RSVP with private response token
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      parameters:
+      - in: path
+        name: responseToken
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RSVPUpdate'
+  /services:
+    get:
+      tags:
+      - Services
+      summary: Public catalog
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+      - in: query
+        name: city
+        schema:
+          type: string
+      - in: query
+        name: category
+        schema:
+          type: string
+      - in: query
+        name: maxPrice
+        schema:
+          type: string
+      - in: query
+        name: sort
+        schema:
+          type: string
+      - in: query
+        name: limit
+        schema:
+          type: string
+      - in: query
+        name: offset
+        schema:
+          type: string
+    post:
+      tags:
+      - Services
+      summary: Create service
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+  /services/mine:
+    get:
+      tags:
+      - Services
+      summary: Provider own services
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /services/{id}:
+    get:
+      tags:
+      - Services
+      summary: Public service details
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    patch:
+      tags:
+      - Services
+      summary: Update own service
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+    delete:
+      tags:
+      - Services
+      summary: Delete own service
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+  /providers/{id}:
+    get:
+      tags:
+      - Providers
+      summary: Public provider portfolio
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+  /favorites:
+    get:
+      tags:
+      - Favorites
+      summary: My saved services
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /favorites/{serviceId}:
+    post:
+      tags:
+      - Favorites
+      summary: Save service
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: serviceId
+        required: true
+        schema:
+          type: integer
+    delete:
+      tags:
+      - Favorites
+      summary: Remove saved service
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: serviceId
+        required: true
+        schema:
+          type: integer
+  /conversations:
+    get:
+      tags:
+      - Messages
+      summary: My conversations
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Messages
+      summary: Start organizer/provider conversation
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationCreate'
+  /conversations/{id}/messages:
+    get:
+      tags:
+      - Messages
+      summary: Get conversation messages
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    post:
+      tags:
+      - Messages
+      summary: Send message
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Created
+        '204':
+          description: Deleted
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
