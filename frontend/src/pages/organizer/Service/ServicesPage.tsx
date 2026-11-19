@@ -1,28 +1,14 @@
+import ServicesFilters from '../../../features/services/ServicesFilters';
 
-import { useDeferredValue, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Search } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import {
   useGetServicesQuery,
   serviceImage,
   type ServiceFilters,
 } from '../../../features/services/servicesApi';
 import { useSearchProvidersQuery } from '../../../features/profile/providersApi';
-
-const serviceCategories = [
-  { label: 'Catering', query: 'catering' },
-  { label: 'Venue rental', query: 'venue' },
-  { label: 'Event planning and coordination', query: 'planning' },
-  { label: 'Photography and videography', query: 'photograph' },
-  { label: 'DJ', query: 'music' },
-  { label: 'Decoration', query: 'decoration' },
-  { label: 'Cake and desserts', query: 'dessert' },
-  { label: 'Invitations and printing', query: 'invitation' },
-  { label: 'Transportation', query: 'transportation' },
-  { label: 'Audio-visual (AV) and lighting', query: 'audio' },
-  { label: 'Security and staff', query: 'security' },
-  { label: 'Hosting', query: 'hosting' },
-];
 
 export default function ServicesPage() {
   const [filters, setFilters] = useState<ServiceFilters>({
@@ -34,19 +20,16 @@ export default function ServicesPage() {
     offset: 0,
   });
 
-  const { data, isLoading, isError, refetch } =
+  const { currentData: data, isFetching, isError, refetch } =
     useGetServicesQuery(filters);
-  const deferredSearch = useDeferredValue((filters.search ?? '').trim());
-  const { data: providers = [], isFetching: isSearchingProviders } =
-    useSearchProvidersQuery(deferredSearch, {
-      skip: deferredSearch.length < 2,
+  const search = (filters.search ?? '').trim();
+  const { currentData: providers = [], isFetching: isSearchingProviders, isError: providerError } =
+    useSearchProvidersQuery({ search, city: filters.city, category: filters.category, maxPrice: filters.maxPrice }, {
+      skip: search.length < 2,
     });
 
   const update = (key: keyof ServiceFilters, value: string) =>
     setFilters((prev) => ({ ...prev, [key]: value, offset: 0 }));
-
-  const input =
-    'w-full rounded-xl border border-[#351018]/15 bg-white px-4 py-3 text-sm outline-none';
 
   return (
     <div className="space-y-6">
@@ -59,67 +42,17 @@ export default function ServicesPage() {
         </p>
       </div>
 
-      <div className="grid gap-3 rounded-2xl bg-white p-5 md:grid-cols-4">
-        <input
-          className={input}
-          placeholder="City"
-          value={filters.city}
-          onChange={(e) => update('city', e.target.value)}
-        />
+      <ServicesFilters filters={filters} update={update} />
 
-        <select
-          className={input}
-          value={filters.category}
-          onChange={(e) => update('category', e.target.value)}
-        >
-          <option value="">All categories</option>
-          {serviceCategories.map((category) => (
-            <option key={category.query} value={category.query}>
-              {category.label}
-            </option>
-          ))}
-        </select>
-
-        <input
-          type="number"
-          min="0"
-          className={input}
-          placeholder="Maximum price (AMD)"
-          value={filters.maxPrice}
-          onChange={(e) => update('maxPrice', e.target.value)}
-        />
-
-        <select
-          className={input}
-          value={filters.sort}
-          onChange={(e) => update('sort', e.target.value)}
-        >
-          <option value="newest">Newest</option>
-          <option value="price_asc">Price: Low to High</option>
-          <option value="price_desc">Price: High to Low</option>
-        </select>
-
-        <div className="relative md:col-span-4">
-          <Search
-            size={18}
-            className="absolute left-3 top-3.5 text-gray-400"
-          />
-          <input
-            className={`${input} pl-10`}
-            placeholder="Search services or providers"
-            value={filters.search}
-            onChange={(e) => update('search', e.target.value)}
-          />
-        </div>
-      </div>
-
-      {deferredSearch.length >= 2 && (
+      {search.length >= 2 && (
         <section className="space-y-3" aria-live="polite">
           <h2 className="text-lg font-semibold text-[#351018]">
             Providers
           </h2>
           {isSearchingProviders ? (
             <p className="text-sm text-gray-500">Searching providers...</p>
+          ) : providerError ? (
+            <p className="text-sm text-red-600">Failed to load providers. Try adjusting your search.</p>
           ) : providers.length > 0 ? (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {providers.map((provider) => (
@@ -157,13 +90,13 @@ export default function ServicesPage() {
             </div>
           ) : (
             <p className="text-sm text-gray-500">
-              No providers found for “{deferredSearch}”.
+              No providers found for “{search}”.
             </p>
           )}
         </section>
       )}
 
-      {isLoading ? (
+      {isFetching ? (
         <p>Loading services...</p>
       ) : isError ? (
         <div className="text-red-600">
@@ -173,9 +106,13 @@ export default function ServicesPage() {
           </button>
         </div>
       ) : !data?.rows.length ? (
-        <p className="rounded-2xl bg-white p-10 text-center text-gray-500">
-          No services found.
-        </p>
+        <div className="rounded-2xl bg-white p-10 text-center text-gray-500">
+          <h2 className="font-semibold text-[#351018]">No services found</h2>
+          <p className="mt-2">Try another city or adjust your search.</p>
+          <button className="mt-4 underline" onClick={() => setFilters({ search: '', city: '', category: '', maxPrice: '', sort: 'newest', offset: 0 })}>
+            Clear Filters
+          </button>
+        </div>
       ) : (
         <>
           <p className="text-sm text-gray-500">

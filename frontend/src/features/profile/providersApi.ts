@@ -1,5 +1,6 @@
 
 import { api } from '../../services/api';
+import type { ServiceFilters } from '../services/servicesApi';
 import type { User } from '../../types/auth';
 
 export interface ProviderProfile {
@@ -63,12 +64,12 @@ export interface ReviewPayload {
 
 export const providersApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    searchProviders: builder.query<ProviderSearchResult[], string>({
+    searchProviders: builder.query<ProviderSearchResult[], string | ServiceFilters>({
       query: (search) => ({
         url: '/providers',
-        params: { search },
+        params: typeof search === 'string' ? { search } : { ...search, catalog: 'true' },
       }),
-      providesTags: ['Providers'],
+      providesTags: ['Providers', 'Services'],
     }),
     getProvider: builder.query<ProviderProfile, number>({
       query: (id) => `/providers/${id}`,

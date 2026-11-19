@@ -1,0 +1,142 @@
+/* Existing surface patterns receive one shared treatment; exported artwork is excluded. */
+:root[data-theme-scope='app'] .ye-ui :where(div, section, article, a, form):where(
+  .rounded-2xl, .rounded-3xl
+):where([class~='bg-white'], [class~='bg-[#FFFDFB]'], [class~='bg-white/70']):not(
+  [data-theme-preserve], [data-theme-preserve] *
+) {
+  background-color: var(--ye-surface);
+  border-color: var(--ye-border);
+  box-shadow: var(--ye-shadow);
+}
+
+.ye-ui :where(a, button).group:not([data-theme-preserve], [data-theme-preserve] *) {
+  transition-duration: 220ms;
+}
+
+.ye-ui :where(a.rounded-2xl):not([data-theme-preserve], [data-theme-preserve] *):hover {
+  border-color: var(--ye-rose);
+  box-shadow: 0 12px 28px -16px #35101845;
+}
+
+.ye-ui .ye-event-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--ye-border);
+  border-radius: 1.25rem;
+  background: var(--ye-surface);
+  box-shadow: var(--ye-shadow);
+}
+
+.ye-event-cover {
+  height: 9rem;
+  width: 100%;
+  object-fit: cover;
+}
+
+.ye-event-card-body { padding: 1.5rem; }
+
+.ye-ui .ye-event-header {
+  position: relative;
+  overflow: hidden;
+  border-top: 3px solid var(--ye-rose);
+  background: linear-gradient(115deg, var(--ye-surface) 45%, var(--ye-soft));
+}
+
+.ye-event-header > img {
+  width: 100%;
+  height: clamp(10rem, 22vw, 17rem);
+  object-fit: cover;
+  margin-bottom: 1.5rem;
+  border-radius: 1rem;
+}
+
+.ye-ui .ye-tabs {
+  gap: 0.375rem;
+  padding: 0.375rem;
+  border: 1px solid var(--ye-border);
+  border-radius: 1rem;
+  background: var(--ye-soft);
+  scrollbar-width: thin;
+}
+
+.ye-ui .ye-tabs > :where(button, a) {
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-radius: 0.75rem;
+  white-space: nowrap;
+}
+
+.ye-ui .ye-tabs > [aria-current='page'] {
+  background: #351018;
+  color: #fff8f1;
+  box-shadow: 0 3px 8px #35101820;
+}
+
+.ye-ui .ye-messages {
+  height: min(75svh, 850px);
+  min-height: 420px;
+  box-shadow: var(--ye-shadow);
+}
+
+.ye-ui .ye-chat-body {
+  background: radial-gradient(ellipse at top right, #d9a3aa16, transparent 65%), var(--ye-page);
+}
+
+.ye-ui .ye-chat-heading {
+  background: var(--ye-surface);
+  border-bottom: 1px solid var(--ye-border);
+  padding-inline: 1.25rem;
+}
+
+.ye-ui .ye-message-bubble {
+  box-shadow: 0 3px 10px -6px #35101850;
+  line-height: 1.65;
+}
+
+.ye-ui .ye-message-mine { border-bottom-right-radius: 0.375rem; }
+.ye-ui .ye-message-theirs { border-bottom-left-radius: 0.375rem; }
+
+.ye-ui .ye-composer {
+  background: var(--ye-surface);
+  box-shadow: 0 -5px 16px -14px #35101850;
+}
+
+.ye-ui .ye-conversations > button {
+  width: calc(100% - 1rem);
+  margin: 0.375rem 0.5rem;
+  border-radius: 0.875rem;
+  border-bottom: none;
+}
+
+.ye-ui .ye-notifications {
+  max-height: calc(100svh - 6rem);
+  border-color: var(--ye-border);
+  background: var(--ye-surface);
+  box-shadow: 0 16px 60px -18px #35101865;
+}
+
+.ye-ui .ye-service-filters {
+  border: 1px solid var(--ye-border);
+  box-shadow: var(--ye-shadow);
+}
+
+@media (max-width: 639px) {
+  .ye-ui .ye-messages { min-height: 460px; height: 78svh; }
+  .ye-ui .ye-event-header { padding: 1.25rem; }
+  .ye-event-card-body { padding: 1.25rem; }
+}
+
+.ye-ui .ye-message-history { background: transparent; }
+.ye-ui .ye-message-bubble :where(img, video) { max-width: 100%; border-radius: 0.75rem; }
+.ye-ui .ye-stat { font-variant-numeric: tabular-nums; }
+.ye-ui .ye-stat:hover { border-color: var(--ye-rose); box-shadow: var(--ye-shadow); }
+
+.ye-ui section:has(> h3 + [data-theme-preserve]) {
+  padding: 1rem;
+  border: 1px solid var(--ye-border);
+  border-radius: 1.25rem;
+  background: var(--ye-surface);
+  box-shadow: var(--ye-shadow);
+}

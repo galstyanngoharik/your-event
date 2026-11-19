@@ -1,12 +1,14 @@
-import { useGetTasksQuery } from '../tasksApi';
+import { useGetTasksQuery, type Task } from '../tasksApi';
 
 interface Props {
   eventId: number;
   eventTitle: string;
+  tasks?: Task[];
 }
 
-export default function EventProgress({ eventId, eventTitle }: Props) {
-  const { data: tasks = [], isLoading, isError, refetch } = useGetTasksQuery(eventId);
+export default function EventProgress({ eventId, eventTitle, tasks: suppliedTasks }: Props) {
+  const { data: fetchedTasks = [], isLoading, isError, refetch } = useGetTasksQuery(eventId, { skip: suppliedTasks !== undefined });
+  const tasks = suppliedTasks ?? fetchedTasks;
 
   if (isLoading) {
     return (

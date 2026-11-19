@@ -1,3 +1,4 @@
+import NotificationBell from '../../features/notifications/NotificationBell';
 import { Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
@@ -10,7 +11,9 @@ interface HeaderProps {
 const pageTitles: Record<string, string> = {
   '/organizer': 'Dashboard',
   '/organizer/events': 'My Events',
-  '/organizer/saved': 'Saved Services',
+  '/organizer/favorites': 'Saved Services',
+  '/organizer/services': 'Services Catalog',
+  '/organizer/events/new': 'Create Event',
   '/organizer/messages': 'Messages',
   '/organizer/profile': 'My Profile',
   '/provider': 'Dashboard',
@@ -43,7 +46,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
     : 'Plan your perfect moments';
 
   return (
-    <header className="flex h-20 items-center justify-between border-b border-[#D9A3AA]/50 bg-[#FFFDFB] px-5 md:px-8">
+    <header className="ye-header flex h-20 items-center justify-between border-b border-[#D9A3AA]/50 bg-[#D9A3AA] px-5 md:px-8">
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
@@ -65,8 +68,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-5">
+        <NotificationBell />
         <div
-          className="hidden text-right sm:block"
+          className="hidden max-w-48 truncate text-right sm:block"
         >
           <p className="text-sm font-semibold text-[#351018]">
             {displayName}

@@ -1,6 +1,8 @@
+import OrganizerProfileAvatar from '../../features/profile/OrganizerProfileAvatar';
+import ThemeToggle from '../../features/theme/ThemeToggle';
 
 import { useEffect, useState } from 'react';
-import { Camera, Save, UserRound, Trash2 } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { setUser } from '../../features/auth/authSlice';
 import { useGetMeQuery } from '../../features/auth/authApi';
@@ -8,17 +10,6 @@ import {
   useUpdateProfileMutation,
   useUploadAvatarMutation,
 } from '../../features/profile/profileApi';
-
-const avatarUrl = (path: string | null) => {
-  if (!path) return null;
-  if (/^https?:\/\//i.test(path)) return path;
-
-  const base = (
-    import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
-  ).replace(/\/api\/?$/, '');
-
-  return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
-};
 
 export default function OrganizerProfilePage() {
   const dispatch = useAppDispatch();
@@ -126,84 +117,24 @@ export default function OrganizerProfilePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-[#351018]">
-          My Profile
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Manage your personal information.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-[#351018]">
+            My Profile
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Manage your personal information.
+          </p>
+        </div>
+        <ThemeToggle />
       </div>
 
       <form
         onSubmit={handleSave}
         className="space-y-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8"
       >
-        <div className="flex flex-col items-center gap-4 border-b border-gray-100 pb-6 sm:flex-row">
-          <div className="relative">
-            {avatarUrl(avatar) ? (
-              <img
-                src={avatarUrl(avatar)!}
-                alt="Profile avatar"
-                className="h-28 w-28 rounded-full border-4 border-[#351018]/10 object-cover"
-              />
-            ) : (
-              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#351018]/10">
-                <UserRound size={44} className="text-[#351018]" />
-              </div>
-            )}
-
-            <label
-              htmlFor="avatar-upload"
-              className="absolute bottom-0 right-0 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#351018] text-white shadow"
-            >
-              <Camera size={17} />
-            </label>
-
-            <input
-              id="avatar-upload"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleAvatarChange}
-              disabled={isUploading || isSaving}
-              className="hidden"
-            />
-          </div>
-
-          <div className="space-y-2 text-center sm:text-left">
-            <h2 className="text-lg font-semibold text-[#351018]">
-              {user?.name || currentUser?.name}
-            </h2>
-
-            <p className="text-sm text-gray-500">
-              Organizer
-            </p>
-
-            <p className="text-xs text-gray-400">
-              JPG, PNG or WEBP. Maximum 5 MB.
-            </p>
-
-            {avatar && (
-              <button
-                type="button"
-                onClick={() => {
-                  setAvatar(null);
-                  setMessage('Click Save Changes to remove your avatar.');
-                }}
-                className="inline-flex items-center gap-1 text-xs text-red-600"
-              >
-                <Trash2 size={14} />
-                Remove photo
-              </button>
-            )}
-
-            {isUploading && (
-              <p className="text-xs text-gray-500">
-                Uploading photo...
-              </p>
-            )}
-          </div>
-        </div>
+        <OrganizerProfileAvatar avatar={avatar} displayName={user?.name || currentUser?.name} isUploading={isUploading}
+          isSaving={isSaving} handleAvatarChange={handleAvatarChange} setAvatar={setAvatar} setMessage={setMessage} />
 
         <div className="space-y-2">
           <label

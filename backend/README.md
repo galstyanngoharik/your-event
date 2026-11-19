@@ -53,3 +53,28 @@ Register with `POST /api/auth/register`, then login with `POST /api/auth/login`.
 - `sequelize.sync()` is for local development. Use migrations for production.
 - `DATABASE_URL` must point to an existing database.
 - Seeded credentials are for local development only.
+
+
+### Notifications and event timeline
+
+Restart the API with `npm start` (or the existing `npm run dev`) to create the new
+`Notifications` and `TimelineActivities` tables through the existing `db.sync()` startup.
+No reset or destructive migration is required.
+
+Notifications are recipient-scoped and persist in PostgreSQL. New messages,
+message edits/deletions and public RSVP responses generate notifications from existing actions.
+There is no collaboration workflow in this version, so no collaboration notices are generated.
+The frontend polls every 15 seconds. Mark-one and mark-all operations invalidate that cache.
+
+Reminders run on startup and every 60 seconds while the backend process is running.
+They cover planning events in the next 24 hours and incomplete tasks due today or tomorrow.
+Task calendar days use `APP_TIMEZONE`, defaulting to `Asia/Yerevan`.
+A unique occurrence key prevents duplicates across polls, restarts and multiple API processes.
+While the backend is stopped no reminders are generated; restart catches still-upcoming items.
+
+Notification routes: `GET /api/notifications`, `PATCH /api/notifications/:id/read`,
+and `PATCH /api/notifications/read-all`.
+Timeline routes: `GET/POST /api/events/:eventId/timeline` and
+`PATCH/DELETE /api/events/:eventId/timeline/:activityId`.
+Timeline times are local single-day `HH:mm` strings, sorted by start time then ID.
+The current event-owner authorization rules apply. End time must be later than start time.

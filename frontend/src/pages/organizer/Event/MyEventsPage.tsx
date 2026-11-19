@@ -1,3 +1,4 @@
+import EventCard from '../../../features/events/components/EventCard';
 import { Link } from 'react-router-dom';
 import { CalendarDays, Plus } from 'lucide-react';
 
@@ -61,27 +62,7 @@ export default function MyEventsPage() {
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {events.map((event) => (
-            <Link
-              key={event.id}
-              to={`/organizer/events/${event.id}`}
-              className="rounded-2xl border border-[#D9A3AA]/40 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#D9A3AA] hover:shadow-md"
-            >
-              <span className="rounded-full bg-[#D9A3AA]/30 px-3 py-1 text-xs capitalize text-[#351018]">
-                {event.status}
-              </span>
-
-              <h3 className="mt-5 text-xl font-semibold text-[#351018]">
-                {event.title}
-              </h3>
-
-              <p className="mt-2 text-sm text-[#351018]/60">
-                {new Date(event.date).toLocaleDateString()}
-              </p>
-
-              <p className="mt-4 font-medium text-[#351018]">
-                {Number(event.budget).toLocaleString()} AMD
-              </p>
-            </Link>
+            <EventCard key={event.id} event={event} />
           ))}
         </div>
       )}

@@ -1,0 +1,216 @@
+.ye-ui .ye-premium-messages .ye-message-history {
+  background: transparent;
+  padding: 1.5rem;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.ye-premium-messages .ye-message-row {
+  margin-top: 1.125rem;
+}
+.ye-premium-messages .ye-message-row:first-child {
+  margin-top: 0;
+}
+.ye-premium-messages .ye-message-row[data-grouped='true'] {
+  margin-top: 0.375rem;
+}
+
+.ye-ui .ye-premium-messages .ye-message-bubble {
+  width: fit-content;
+  max-width: min(80%, 36rem);
+  padding: 0.875rem 1rem 0.625rem;
+  border-radius: 1.25rem;
+  line-height: 1.7;
+  box-shadow: 0 3px 10px -6px #35101830;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+:root[data-theme-scope='app'] .ye-premium-messages .ye-message-mine {
+  background: #351018;
+  color: #fff;
+  border: 1px solid #351018;
+  border-bottom-right-radius: 0.375rem;
+}
+
+:root[data-theme-scope='app'] .ye-premium-messages .ye-message-theirs {
+  background: #fff8f1;
+  color: #351018;
+  border: 1px solid #d9a3aa55;
+  border-bottom-left-radius: 0.375rem;
+}
+
+.ye-premium-messages .ye-message-meta {
+  min-height: 1.5rem;
+  gap: 0.5rem;
+  font-size: 0.625rem;
+  font-variant-numeric: tabular-nums;
+}
+.ye-premium-messages .ye-message-meta time {
+  white-space: nowrap;
+}
+.ye-premium-messages .ye-message-mine .ye-message-meta {
+  color: #f2d9dcbf;
+}
+.ye-premium-messages .ye-message-theirs .ye-message-meta {
+  color: #80686c;
+}
+
+.ye-premium-messages .ye-message-image {
+  overflow: hidden;
+  border: 1px solid #d9a3aa35;
+  border-radius: 0.875rem;
+  background: #d9a3aa10;
+}
+.ye-premium-messages .ye-message-image img {
+  transition: opacity 180ms;
+}
+.ye-premium-messages .ye-message-image:hover img {
+  opacity: 0.92;
+}
+.ye-premium-messages .ye-message-bubble video {
+  border: 1px solid #d9a3aa35;
+  background: #351018;
+}
+.ye-premium-messages .ye-voice-player {
+  width: 17rem;
+  max-width: 100%;
+  padding: 0.375rem 0.125rem;
+}
+.ye-premium-messages .ye-voice-player input[type='range'] {
+  height: 1rem;
+  accent-color: #d9a3aa;
+}
+
+.ye-ui .ye-premium-messages .ye-composer {
+  flex-shrink: 0;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--ye-border);
+  background: var(--ye-surface);
+  box-shadow: 0 -6px 20px -18px #35101845;
+}
+
+.ye-premium-messages .ye-composer-controls {
+  gap: 0.625rem;
+}
+.ye-premium-messages .ye-composer-icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  color: var(--ye-muted);
+}
+.ye-premium-messages .ye-composer-icon:hover {
+  background: var(--ye-soft);
+  color: var(--ye-ink);
+}
+.ye-premium-messages .ye-composer-controls > input {
+  border-radius: 1rem;
+  padding: 0.875rem 1rem;
+}
+.ye-premium-messages .ye-send-button {
+  min-height: 2.875rem;
+  border-radius: 0.875rem;
+  flex-shrink: 0;
+}
+.ye-premium-messages .ye-composer-preview {
+  border: 1px solid var(--ye-border);
+}
+.ye-premium-messages .ye-message-actions summary {
+  color: inherit;
+}
+
+:root[data-theme-scope='app'] .ye-premium-messages .ye-message-actions > div {
+  padding: 0.375rem;
+  border: 1px solid var(--ye-border);
+  border-radius: 0.875rem;
+  background: var(--ye-surface);
+  color: var(--ye-ink);
+  box-shadow: 0 8px 24px -10px #35101855;
+}
+
+.ye-premium-messages .ye-message-actions[data-placement='above'] > div {
+  top: auto;
+  bottom: calc(100% + 0.375rem);
+}
+.ye-premium-messages .ye-message-actions[data-placement='below'] > div {
+  top: calc(100% + 0.375rem);
+  bottom: auto;
+}
+
+:root[data-theme='dark'][data-theme-scope='app'] .ye-premium-messages .ye-chat-body {
+  background: radial-gradient(ellipse at top right, #35101855, transparent 65%), #171315;
+}
+
+:root[data-theme='dark'][data-theme-scope='app'] .ye-premium-messages .ye-message-theirs {
+  background: #30232a;
+  color: #f8eff1;
+  border-color: #60454f;
+}
+
+:root[data-theme='dark'][data-theme-scope='app'] .ye-premium-messages .ye-message-theirs .ye-message-meta {
+  color: #c3b1b7;
+}
+:root[data-theme='dark'][data-theme-scope='app'] .ye-premium-messages .ye-message-mine {
+  border-color: #704550;
+}
+
+@keyframes ye-message-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ye-premium-messages .ye-message-row {
+    animation: ye-message-arrive 180ms ease-out both;
+  }
+  .ye-premium-messages .ye-message-actions[open] > div {
+    animation: ye-message-arrive 150ms ease-out both;
+  }
+  .ye-premium-messages .ye-conversation-skeleton {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ye-premium-messages .ye-conversation-card,
+  .ye-premium-messages .ye-message-image img {
+    transition: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .ye-ui .ye-premium-messages .ye-message-history {
+    padding: 1rem;
+  }
+  .ye-ui .ye-premium-messages .ye-message-bubble {
+    max-width: 88%;
+    padding: 0.75rem 0.875rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+  .ye-ui .ye-premium-messages .ye-composer {
+    padding: 0.75rem;
+  }
+  .ye-premium-messages .ye-composer-controls {
+    gap: 0.25rem;
+  }
+  .ye-premium-messages .ye-composer-icon {
+    width: 2rem;
+    height: 2.5rem;
+    padding: 0.375rem;
+  }
+  .ye-premium-messages .ye-send-button {
+    padding: 0.75rem;
+  }
+  .ye-premium-messages .ye-composer-controls > input {
+    padding: 0.75rem;
+    font-size: 0.8125rem;
+  }
+}

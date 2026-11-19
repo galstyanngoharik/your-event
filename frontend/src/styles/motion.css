@@ -1,0 +1,24 @@
+@keyframes ye-enter {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ye-page > *, .ye-notifications, .ye-ui dialog[open] {
+    animation: ye-enter 220ms ease-out both;
+  }
+  .ye-ui .ye-event-card { transition: transform 220ms, box-shadow 220ms, border-color 220ms; }
+  .ye-ui .ye-event-card:hover { transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ye-ui *, .ye-ui *::before, .ye-ui *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .ye-ui :where(a, button, .group):hover:not([data-theme-preserve], [data-theme-preserve] *) {
+    transform: none;
+  }
+}

@@ -1,14 +1,9 @@
+import { currencyCode } from '../../../features/events/currency';
+import TimelineTab from '../../../features/events/components/TimelineTab';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import {
-  ArrowLeft,
-  CalendarDays,
-  MapPin,
-  Wallet,
-  Users,
-  Pencil,
-  Trash2,
-} from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import EventHeader from '../../../features/events/components/EventHeader';
 
 import {
   useGetEventByIdQuery,
@@ -20,7 +15,7 @@ import GuestsTab from '../../../features/events/components/GuestsTab';
 import InvitationBuilder from '../../../features/events/components/InvitationBuilder';
 import EventCountdown from '../../../features/events/components/EventCountdown';
 import EventProgress from '../../../features/events/components/EventProgress';
-const tabs = ['Overview', 'Tasks', 'Budget', 'Guests', 'Invitation', 'Moodboard'];
+const tabs = ['Overview', 'Tasks', 'Budget', 'Guests', 'Invitation', 'Moodboard', 'Timeline'];
 
 export default function EventDetailsPage() {
   const { id } = useParams();
@@ -56,29 +51,6 @@ export default function EventDetailsPage() {
     return <p className="text-red-600">Event not found.</p>;
   }
 
-  const details = [
-    {
-      label: 'Date',
-      value: new Date(event.date).toLocaleDateString(),
-      icon: CalendarDays,
-    },
-    {
-      label: 'Location',
-      value: event.city,
-      icon: MapPin,
-    },
-    {
-      label: 'Budget',
-      value: `${Number(event.budget).toLocaleString()} AMD`,
-      icon: Wallet,
-    },
-    {
-      label: 'Expected Guests',
-      value: event.expectedGuests,
-      icon: Users,
-    },
-  ];
-
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       <Link
@@ -89,62 +61,10 @@ export default function EventDetailsPage() {
         Back to Events
       </Link>
 
-      <section className="rounded-2xl border border-[#351018]/10 bg-white p-6 md:p-8">
-        <div className="flex flex-wrap items-start justify-between gap-5">
-          <div>
-            <span className="rounded-full bg-[#351018]/5 px-3 py-1 text-xs capitalize text-[#351018]">
-              {event.status}
-            </span>
-
-            <h1 className="mt-5 text-3xl font-semibold text-[#351018]">
-              {event.title}
-            </h1>
-
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#351018]/60">
-              {event.description || 'No description provided.'}
-            </p>
-          </div>
-
-          <div className="flex gap-3">
-            <Link
-              to={`/organizer/events/${eventId}/edit`}
-              className="flex items-center gap-2 rounded-xl border border-[#351018]/20 px-4 py-2.5 text-sm text-[#351018]"
-            >
-              <Pencil size={16} />
-              Edit
-            </Link>
-
-            <button
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="flex items-center gap-2 rounded-xl bg-[#351018] px-4 py-2.5 text-sm text-white disabled:opacity-50"
-            >
-              <Trash2 size={16} />
-              Delete
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {details.map(({ label, value, icon: Icon }) => (
-            <div
-              key={label}
-              className="rounded-xl border border-[#351018]/10 p-5"
-            >
-              <Icon size={21} className="mb-4 text-[#351018]" />
-
-              <p className="text-xs text-[#351018]/50">{label}</p>
-
-              <p className="mt-2 font-semibold text-[#351018]">
-                {value}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <EventHeader event={event} deleting={isDeleting} remove={handleDelete} />
 
       <section className="rounded-2xl border border-[#351018]/10 bg-white p-6">
-        <div className="flex gap-6 overflow-x-auto border-b border-[#351018]/10">
+        <div className="ye-tabs flex overflow-x-auto">
          {tabs.map((tab) => (
             tab === 'Moodboard' ? (
               <Link
@@ -159,6 +79,7 @@ export default function EventDetailsPage() {
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
+                aria-current={activeTab === tab ? 'page' : undefined}
                 className={`shrink-0 border-b-2 pb-4 text-sm font-medium transition ${
                   activeTab === tab
                     ? 'border-[#351018] text-[#351018]'
@@ -194,13 +115,15 @@ export default function EventDetailsPage() {
 
         {activeTab === 'Budget' && (
             <ExpensesTab eventId={eventId}
-            budget={Number(event.budget)}
+            budget={Number(event.budget)} currency={currencyCode(event.currency)}
             />
         )}
 
         {activeTab === 'Guests' && (
             <GuestsTab eventId={eventId} />
         )}
+
+        {activeTab === 'Timeline' && <TimelineTab key={eventId} eventId={eventId} eventDate={event.date} />}
 
         {activeTab === 'Invitation' && (
           <InvitationBuilder eventId={eventId} event={event} />

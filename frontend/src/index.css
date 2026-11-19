@@ -1,1 +1,149 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(
+  [data-theme="dark"][data-theme-scope="app"],
+  [data-theme="dark"][data-theme-scope="app"] *
+));
+
+:root[data-theme="dark"][data-theme-scope="app"] {
+  color-scheme: dark;
+  background-color: #121212;
+  color: #FFFFFF;
+}
+
+[data-theme-preserve] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(
+  body,
+  [class~="bg-[#F8F3EF]"],
+  [class~="bg-[#FFF8F1]"],
+  [class~="bg-[#FFFDFB]"]
+):not([data-theme-preserve], [data-theme-preserve] *) {
+  background-color: #121212;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(
+  [class~="bg-white"],
+  [class~="bg-white/70"],
+  [class~="bg-white/85"],
+  [class~="bg-white/90"],
+  [class~="bg-gray-50"],
+  [class~="bg-gray-50/50"],
+  [class~="bg-gray-100"],
+  [class~="bg-[#F4E8DC]"],
+  [class~="bg-[#F5EFF0]"],
+  [class~="bg-[#F7DDE5]"],
+  [class*="bg-[#F2D9DC]"],
+  [class~="bg-[#351018]/5"],
+  [class~="bg-[#351018]/10"],
+  [class~="bg-[#351018]/15"],
+  [class~="bg-[#351018]/20"]
+):not([data-theme-preserve], [data-theme-preserve] *) {
+  background-color: #202020;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(
+  [class~="text-[#351018]"],
+  [class~="text-black"],
+  [class~="text-gray-600"],
+  [class~="text-gray-800"]
+):not([data-theme-preserve], [data-theme-preserve] *) {
+  color: #FFFFFF;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(
+  [class*="text-[#351018]/"],
+  [class~="text-gray-400"],
+  [class~="text-gray-500"]
+):not([data-theme-preserve], [data-theme-preserve] *) {
+  color: #BDB6B8;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(
+  [class~="text-[#A86F79]"],
+  [class~="text-[#A96D79]"],
+  [class~="text-[#B77886]"]
+):not([data-theme-preserve], [data-theme-preserve] *) {
+  color: #D9A3AA;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(
+  [class~="text-red-500"],
+  [class~="text-red-600"]
+):not([data-theme-preserve], [data-theme-preserve] *) {
+  color: #FDA4AF;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(
+  [class~="text-green-500"],
+  [class~="text-green-600"],
+  [class~="text-green-700"]
+):not([data-theme-preserve], [data-theme-preserve] *) {
+  color: #86EFAC;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(
+  [class*="border-[#351018]"],
+  [class*="border-gray-"],
+  [class*="divide-[#351018]"]
+):not([data-theme-preserve], [data-theme-preserve] *) {
+  border-color: #49383D;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), textarea, select, option):not([data-theme-preserve], [data-theme-preserve] *) {
+  background-color: #252525;
+  color: #FFFFFF;
+  border-color: #59434A;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(
+  input,
+  textarea
+):not([data-theme-preserve], [data-theme-preserve] *)::placeholder {
+  color: #ABA1A5;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(
+  input,
+  textarea,
+  select
+):not([data-theme-preserve], [data-theme-preserve] *):focus {
+  border-color: #D9A3AA;
+  outline-color: #D9A3AA;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where([class~="bg-[#D9A3AA]"]):not([data-theme-preserve], [data-theme-preserve] *) {
+  color: #351018;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where([class~="bg-[#D9A3AA]"]) :where([class*="text-[#351018]"]):not([data-theme-preserve], [data-theme-preserve] *) {
+  color: #351018;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(
+  [class*="hover:bg-gray-50"],
+  [class*="hover:bg-[#F2D9DC]"]
+):not([data-theme-preserve], [data-theme-preserve] *):hover {
+  background-color: #33292D;
+  color: #FFFFFF;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where([class*="hover:bg-[#D9A3AA]"]):not([data-theme-preserve], [data-theme-preserve] *):hover {
+  background-color: #D9A3AA;
+  color: #351018;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where(dialog):not([data-theme-preserve], [data-theme-preserve] *) {
+  background-color: #202020;
+  color: #FFFFFF;
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] dialog::backdrop {
+  background-color: rgb(0 0 0 / 85%);
+}
+
+:root[data-theme="dark"][data-theme-scope="app"] :where([class~="bg-[#F2D9DC]"][class~="rounded-full"]):not([data-theme-preserve], [data-theme-preserve] *) {
+  background-color: #D9A3AA;
+  color: #351018;
+}

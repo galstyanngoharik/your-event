@@ -1,3 +1,5 @@
+import { formatMoney, type CurrencyCode } from '../currency';
+import BudgetProgressCircle from './BudgetProgressCircle';
 import { useState } from 'react';
 import { Plus, Trash2, Wallet } from 'lucide-react';
 import {
@@ -8,9 +10,10 @@ import {
 interface Props {
   eventId: number;
   budget: number;
+  currency: CurrencyCode;
 }
 
-export default function ExpensesTab({ eventId, budget }: Props) {
+export default function ExpensesTab({ eventId, budget, currency }: Props) {
     const [title, setTitle] = useState('');
     const [amount, setAmount] = useState('');
     const [error, setError] = useState('');
@@ -56,9 +59,10 @@ export default function ExpensesTab({ eventId, budget }: Props) {
 
     return (
         <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-[#351018]">
-            Budget & Expenses
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 className="text-xl font-semibold text-[#351018]">Budget & Expenses</h2>
+          <BudgetProgressCircle budget={budget} spent={spent} />
+        </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
             {[
@@ -68,18 +72,18 @@ export default function ExpensesTab({ eventId, budget }: Props) {
             ].map((item) => (
             <div
                 key={item.label}
-                className="rounded-xl border border-[#351018]/10 p-5"
+                className="rounded-xl border border-[#351018]/10 bg-[#351018]/10 p-5"
             >
                 <Wallet size={20} className="mb-3 text-[#351018]" />
                 <p className="text-xs text-[#351018]/50">{item.label}</p>
                 <p className="mt-2 text-xl font-semibold text-[#351018]">
-                {item.value.toLocaleString()} AMD
+                {formatMoney(item.value, currency)}
                 </p>
             </div>
             ))}
             {remaining < 0 && (
             <p className="text-sm text-red-600">
-                Budget exceeded by {Math.abs(remaining).toLocaleString()} AMD
+                Budget exceeded by {formatMoney(Math.abs(remaining), currency)}
             </p>
             )}
         </div>
@@ -153,7 +157,7 @@ export default function ExpensesTab({ eventId, budget }: Props) {
 
                 <div className="flex items-center gap-5">
                 <span className="text-sm font-semibold text-[#351018]">
-                    {Number(expense.amount).toLocaleString()} AMD
+                    {formatMoney(Number(expense.amount), currency)}
                 </span>
 
                 <button

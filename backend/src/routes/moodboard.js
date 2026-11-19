@@ -37,7 +37,7 @@ r.get('/:eventId/moodboard',auth,role('organizer'),safe(async(req,res)=>{
     MoodboardItem.findAll({where:{eventId:event.id},order:[['position','ASC'],['createdAt','ASC']]}),
     MoodboardPalette.findOne({where:{eventId:event.id}}),
   ]);
-  res.json({items,colors:palette?.colors||[]});
+  res.json({items,colors:palette?.colors||[],layout:palette?.layout||{}});
 }));
 
 r.post('/:eventId/moodboard',auth,role('organizer'),upload.single('image'),safe(async(req,res)=>{
@@ -66,6 +66,28 @@ r.patch('/:eventId/moodboard/order',auth,role('organizer'),safe(async(req,res)=>
   if(items.length!==body.itemIds.length||items.some(item=>!body.itemIds.includes(item.id)))throw fail(400,'Order must include every moodboard item exactly once.');
   await Promise.all(body.itemIds.map((itemId,position)=>MoodboardItem.update({position},{where:{id:itemId,eventId:event.id}})));
   res.json(await MoodboardItem.findAll({where:{eventId:event.id},order:[['position','ASC'],['createdAt','ASC']]}));
+}));
+
+r.put('/:eventId/moodboard/layout',auth,role('organizer'),safe(async(req,res)=>{
+  const event=await eventOwned(req);
+  const entry=z.object({
+    x:z.number().finite().min(0).max(5000),
+    y:z.number().finite().min(0).max(5000),
+    width:z.number().finite().min(120).max(600),
+    rotation:z.number().finite().min(-180).max(180),
+    zIndex:z.number().int().min(0).max(1000000),
+  }).strict();
+  const body=parse(z.object({layout:z.record(entry)}).strict(),req.body);
+  const keys=Object.keys(body.layout);
+  if(keys.length>220)throw fail(400,'Too many layout entries.');
+  const items=await MoodboardItem.findAll({where:{eventId:event.id}});
+  const validKeys=new Set(items.map(item=>`photo-${item.id}`));
+  for(const key of keys){
+    if(!validKeys.has(key)&&!/^color-#[0-9A-F]{6}$/.test(key))throw fail(400,'Invalid layout item.');
+  }
+  const [palette]=await MoodboardPalette.findOrCreate({where:{eventId:event.id},defaults:{colors:[]}});
+  await palette.update({layout:body.layout});
+  res.json({layout:palette.layout});
 }));
 
 r.patch('/:eventId/moodboard/:itemId',auth,role('organizer'),safe(async(req,res)=>{

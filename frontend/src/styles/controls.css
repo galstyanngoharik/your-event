@@ -1,0 +1,62 @@
+.ye-ui :where(button, a, input, textarea, select):not([data-theme-preserve], [data-theme-preserve] *) {
+  -webkit-tap-highlight-color: transparent;
+  transition-duration: 200ms;
+}
+
+.ye-ui :where(button, a):not([data-theme-preserve], [data-theme-preserve] *):focus-visible {
+  outline: 2px solid var(--ye-focus);
+  outline-offset: 4px;
+}
+
+:root[data-theme-scope='app'] .ye-ui :where(
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):not([type='file']),
+  textarea, select
+):not([data-theme-preserve], [data-theme-preserve] *) {
+  min-width: 0;
+  border-color: var(--ye-border);
+  background-color: var(--ye-surface);
+  color: var(--ye-ink);
+  box-shadow: 0 1px 2px #35101804;
+  transition: border-color 180ms, box-shadow 180ms;
+}
+
+:root[data-theme-scope='app'] .ye-ui :where(input, textarea, select):not(
+  [data-theme-preserve], [data-theme-preserve] *
+):focus {
+  border-color: var(--ye-focus);
+  outline: none;
+  box-shadow: 0 0 0 3px #d9a3aa30;
+}
+
+.ye-ui :where(input, textarea):not([data-theme-preserve], [data-theme-preserve] *)::placeholder {
+  color: var(--ye-muted);
+  opacity: 0.8;
+}
+
+.ye-ui :where(button, a):where([class~='bg-[#351018]']):not(
+  [data-theme-preserve], [data-theme-preserve] *, .ye-conversations *
+) {
+  box-shadow: 0 3px 6px -3px #35101850;
+}
+
+.ye-ui :where(button, a):where([class~='bg-[#351018]']):not(
+  [data-theme-preserve], [data-theme-preserve] *
+):hover {
+  background-color: #572331;
+  color: #fff8f1;
+}
+
+.ye-ui :where(button, a):not([data-theme-preserve], [data-theme-preserve] *):active {
+  transition-duration: 100ms;
+}
+
+.ye-ui button:disabled:not([data-theme-preserve], [data-theme-preserve] *) { cursor: not-allowed; }
+.ye-ui :where(input[type='checkbox'], input[type='radio']):not([data-theme-preserve], [data-theme-preserve] *) { accent-color: var(--ye-focus); }
+
+:root[data-theme-scope='app'] .ye-ui dialog:not([data-theme-preserve], [data-theme-preserve] *) {
+  border-radius: 1.25rem;
+  border-color: var(--ye-border);
+  box-shadow: 0 24px 80px #0004;
+}
+
+.ye-ui dialog::backdrop { backdrop-filter: blur(3px); }

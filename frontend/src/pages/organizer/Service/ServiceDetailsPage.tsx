@@ -1,3 +1,4 @@
+import SaveServiceButton from '../../../features/services/SaveServiceButton';
 
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, MapPin, UserRound } from 'lucide-react';
@@ -51,9 +52,10 @@ export default function ServiceDetailsPage() {
           <div className="space-y-5 p-8">
             <p className="text-sm text-gray-500">{service.category}</p>
 
-            <h1 className="text-3xl font-semibold text-[#351018]">
-              {service.title}
-            </h1>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <h1 className="text-3xl font-semibold text-[#351018]">{service.title}</h1>
+              <SaveServiceButton key={service.id} serviceId={service.id} />
+            </div>
 
             <p className="flex items-center gap-2 text-gray-600">
               <MapPin size={18} /> {service.city}

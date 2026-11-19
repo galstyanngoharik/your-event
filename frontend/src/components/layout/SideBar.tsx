@@ -83,7 +83,7 @@ export default function Sidebar({ isOpen, onClose, role = 'organizer' }: Sidebar
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/15 bg-[#351018] transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`ye-sidebar fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/15 bg-[#351018] transition-transform duration-300 lg:static lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -91,8 +91,9 @@ export default function Sidebar({ isOpen, onClose, role = 'organizer' }: Sidebar
           <NavLink
             to={role === 'provider' ? '/provider' : '/organizer'}
             onClick={onClose}
-            className="text-2xl font-bold tracking-tight text-[#FFF8F1]"
+            className="inline-flex items-center gap-2 text-2xl font-bold tracking-tight text-[#FFF8F1]"
           >
+            <Heart size={25} fill="none" aria-hidden="true" className="shrink-0 text-white" />
             YourEvent.
           </NavLink>
 

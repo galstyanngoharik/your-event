@@ -1,62 +1,40 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   CalendarDays,
-  CalendarCheck,
-  CheckCircle2,
-  Wallet,
   Plus,
   ArrowRight,
 } from 'lucide-react';
 
-import { useGetEventsQuery } from '../../features/events/eventsApi';
+import { useGetDashboardEventsQuery } from '../../features/events/eventsApi';
+import DashboardAnalytics, { AnalyticsSkeleton } from '../../features/dashboard/DashboardAnalytics';
 import EventCountdown from '../../features/events/components/EventCountdown';
 import EventProgress from '../../features/events/components/EventProgress';
 
 export default function OrganizerDashboard() {
-  const { data: events = [], isLoading, isError } = useGetEventsQuery();
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 30000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const { data: events = [], isLoading, isError, isFetching, refetch } = useGetDashboardEventsQuery(undefined, {
+    pollingInterval: 30000,
+    refetchOnMountOrArgChange: true,
+  });
 
   const upcomingEvents = events.filter(
     (event) =>
-      new Date(event.date) >= new Date() &&
+      new Date(event.date).getTime() >= now &&
       event.status !== 'cancelled'
   );
 
-  const totalBudget = events.reduce(
-    (sum, event) => sum + Number(event.budget),
-    0
-  );
   const nearestEvent = [...upcomingEvents]
     .filter((event) => Number.isFinite(new Date(event.date).getTime()))
     .sort((first, second) => new Date(first.date).getTime() - new Date(second.date).getTime())[0];
 
-  const stats = [
-    {
-      title: 'Total Events',
-      value: events.length,
-      icon: CalendarDays,
-    },
-    {
-      title: 'Upcoming Events',
-      value: upcomingEvents.length,
-      icon: CalendarCheck,
-    },
-    {
-      title: 'Completed Events',
-      value: events.filter((event) => event.status === 'completed').length,
-      icon: CheckCircle2,
-    },
-    {
-      title: 'Total Budget',
-      value: `${totalBudget.toLocaleString()} AMD`,
-      icon: Wallet,
-    },
-  ];
-
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#351018]/20 border-t-[#351018]" />
-      </div>
+      <AnalyticsSkeleton />
     );
   }
 
@@ -64,6 +42,7 @@ export default function OrganizerDashboard() {
     return (
       <p className="text-sm text-red-600">
         Failed to load dashboard data.
+        <button type="button" onClick={() => refetch()} className="ml-2 underline">Try again</button>
       </p>
     );
   }
@@ -90,24 +69,7 @@ export default function OrganizerDashboard() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map(({ title, value, icon: Icon }) => (
-          <div
-            key={title}
-            className="rounded-2xl border border-[#D9A3AA]/50 bg-[#FFFDFB] p-6"
-          >
-            <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-[#D9A3AA]/40">
-              <Icon size={21} className="text-[#351018]" />
-            </div>
-
-            <p className="text-sm text-[#351018]/60">{title}</p>
-
-            <h3 className="mt-2 text-2xl font-semibold text-[#351018]">
-              {value}
-            </h3>
-          </div>
-        ))}
-      </div>
+      <DashboardAnalytics events={events} refreshing={isFetching} now={now} />
 
       {nearestEvent ? (
         <section className="space-y-4">
@@ -119,7 +81,7 @@ export default function OrganizerDashboard() {
           </div>
           <div className="grid gap-5 lg:grid-cols-2">
             <EventCountdown date={nearestEvent.date} title={nearestEvent.title} />
-            <EventProgress eventId={nearestEvent.id} eventTitle={nearestEvent.title} />
+            <EventProgress eventId={nearestEvent.id} eventTitle={nearestEvent.title} tasks={nearestEvent.tasks} />
           </div>
         </section>
       ) : (

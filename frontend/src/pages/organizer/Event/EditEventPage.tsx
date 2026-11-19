@@ -1,3 +1,4 @@
+import { currencyCode } from '../../../features/events/currency';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
@@ -51,6 +52,7 @@ export default function EditEventPage() {
     city: event.city,
     address: event.address ?? '',
     budget: Number(event.budget ?? 0),
+    currency: currencyCode(event.currency),
     expectedGuests: event.expectedGuests ?? 0,
     status: event.status,
   };

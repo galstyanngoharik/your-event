@@ -33,6 +33,8 @@ export const api = createApi({
     'Favorites',
     'Conversations',
     'Messages',
+    'Notifications',
+    'Timeline',
   ],
 
   endpoints: () => ({}),

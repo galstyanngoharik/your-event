@@ -10,13 +10,31 @@ export interface MoodboardItem {
   updatedAt: string;
 }
 
+export interface MoodboardPlacement {
+  x: number;
+  y: number;
+  width: number;
+  rotation: number;
+  zIndex: number;
+}
+
+export type MoodboardLayout = Record<string, MoodboardPlacement>;
+
 export interface MoodboardData {
+  layout: MoodboardLayout;
   items: MoodboardItem[];
   colors: string[];
 }
 
 export const moodboardApi = api.injectEndpoints({
   endpoints: (builder) => ({
+    saveMoodboardLayout: builder.mutation<{ layout: MoodboardLayout }, { eventId: number; layout: MoodboardLayout }>({
+      query: ({ eventId, layout }) => ({
+        url: `/events/${eventId}/moodboard/layout`,
+        method: 'PUT',
+        body: { layout },
+      }),
+    }),
     getMoodboard: builder.query<MoodboardData, number>({
       query: (eventId) => `/events/${eventId}/moodboard`,
       providesTags: (_result, _error, eventId) => [{ type: 'Moodboards', id: eventId }],
@@ -64,6 +82,7 @@ export const moodboardApi = api.injectEndpoints({
 });
 
 export const {
+  useSaveMoodboardLayoutMutation,
   useGetMoodboardQuery,
   useUploadMoodboardImageMutation,
   useUpdateMoodboardCaptionMutation,

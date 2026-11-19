@@ -1,5 +1,16 @@
+
+# Dependencies
+node_modules/
+.pnp.*
+.yarn/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,18 +18,49 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Build
+dist/
+dist-ssr/
+build/
+coverage/
+.vite/
+*.tsbuildinfo
 
-# Editor directories and files
+# Local files
+*.local
+*.tmp
+*.temp
+.cache/
+tmp/
+temp/
+
+# Editor files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Operating system
+Thumbs.db
+Desktop.ini
+
+# Test output
+test-results/
+playwright-report/
+
+# Runtime
+*.pid
+*.pid.lock
+
+# Local database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Temporary uploads
+uploads/

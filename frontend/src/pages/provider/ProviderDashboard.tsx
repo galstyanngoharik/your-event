@@ -77,7 +77,7 @@ import { Link } from 'react-router-dom';
  
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
          {stats.map(({ title, value, icon: Icon }) => (
-           <div key={title} className="rounded-2xl border border-[#D9A3AA]/40 bg-white p-6">
+           <div key={title} className="ye-stat rounded-2xl border border-[#D9A3AA]/40 bg-white p-6">
              <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-[#F2D9DC]">
                <Icon size={21} className="text-[#351018]" />
              </div>

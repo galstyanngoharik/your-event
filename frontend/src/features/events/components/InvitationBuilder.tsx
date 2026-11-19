@@ -1,5 +1,11 @@
+import InvitationEnvelopeSelector from './InvitationEnvelopeSelector';
+import InvitationPhotoUpload from './InvitationPhotoUpload';
+import type { InvitationEnvelopeId } from '../invitationEnvelopes';
+import InvitationBackgroundSelector from './InvitationBackgroundSelector';
+import type { InvitationBackgroundTemplate } from '../invitationBackgrounds';
+import InvitationPreview from './InvitationPreview';
 import { useEffect, useState } from 'react';
-import { Copy, Eye, Send, Upload, X } from 'lucide-react';
+import { Copy, Eye, Send } from 'lucide-react';
 import type { Event } from '../eventsApi';
 import {
   useSaveInvitationMutation,
@@ -18,38 +24,22 @@ interface Props {
   event: Event;
 }
 
-const backgroundClasses: Record<InvitationBackground, string> = {
-  cream: 'bg-[#FFF8F1]',
-  blush: 'bg-[#F2D9DC]',
-  white: 'bg-white',
-  burgundy: 'bg-[#351018]',
-};
-
-const textClasses: Record<InvitationTextColor, string> = {
-  burgundy: 'text-[#351018]',
-  white: 'text-white',
-  dustyRose: 'text-[#A96D79]',
-};
-
 const templateDefaults: Record<InvitationTemplate, { background: InvitationBackground; text: InvitationTextColor }> = {
-  romantic: { background: 'blush', text: 'burgundy' },
+  romantic: { background: 'dustyRose', text: 'burgundy' },
   classic: { background: 'cream', text: 'burgundy' },
-  modern: { background: 'white', text: 'burgundy' },
+  modern: { background: 'burgundy', text: 'white' },
 };
 
 const templateLabels: Record<InvitationTemplate, string> = {
-  romantic: 'Romantic',
-  classic: 'Classic',
-  modern: 'Modern',
-};
-
-const designLink = (url: string) => {
-  if (!url) return '';
-  return url.startsWith('http') ? url : `${window.location.origin}${url}`;
+  romantic: 'Dusty Rose',
+  classic: 'Cream',
+  modern: 'Burgundy',
 };
 
 export default function InvitationBuilder({ eventId, event }: Props) {
   const saved = event.invitation;
+  const [envelope, setEnvelope] = useState<InvitationEnvelopeId>(saved?.envelope || 'invitation1');
+  const [backgroundTemplate, setBackgroundTemplate] = useState<InvitationBackgroundTemplate | null>(saved?.backgroundTemplate || null);
   const [template, setTemplate] = useState<InvitationTemplate>(saved?.template || (saved?.theme === 'soft' ? 'romantic' : 'classic'));
   const [backgroundColor, setBackgroundColor] = useState<InvitationBackground>(saved?.backgroundColor || (saved?.theme === 'soft' ? 'blush' : 'cream'));
   const [textColor, setTextColor] = useState<InvitationTextColor>(saved?.textColor || 'burgundy');
@@ -69,6 +59,7 @@ export default function InvitationBuilder({ eventId, event }: Props) {
 
   useEffect(() => {
     if (!saved) return;
+    setEnvelope(saved.envelope || 'invitation1');
     setTemplate(saved.template || (saved.theme === 'soft' ? 'romantic' : 'classic'));
     setBackgroundColor(saved.backgroundColor || (saved.theme === 'soft' ? 'blush' : 'cream'));
     setTextColor(saved.textColor || 'burgundy');
@@ -76,6 +67,7 @@ export default function InvitationBuilder({ eventId, event }: Props) {
     setTitle(saved.title || '');
     setMessage(saved.message || '');
     setBackgroundImage(saved.backgroundImage || null);
+    setBackgroundTemplate(saved.backgroundTemplate || null);
     setPublished(saved.published);
     setInvitationUrl(saved.published && saved.token ? `${window.location.origin}/invite/${saved.token}` : '');
   }, [saved]);
@@ -109,6 +101,13 @@ export default function InvitationBuilder({ eventId, event }: Props) {
     setBackgroundPreview(URL.createObjectURL(file));
   };
 
+  const removePhoto = () => {
+    setBackgroundImage(null);
+    setBackgroundFile(null);
+    if (backgroundPreview) URL.revokeObjectURL(backgroundPreview);
+    setBackgroundPreview(null);
+  };
+
   const handleSave = async () => {
     setError('');
     setNotice('');
@@ -130,6 +129,8 @@ export default function InvitationBuilder({ eventId, event }: Props) {
         message: message.trim(),
         published,
         backgroundImage: imageUrl,
+        backgroundTemplate,
+        envelope,
       }).unwrap();
       setBackgroundImage(invitation.backgroundImage);
       setBackgroundFile(null);
@@ -154,16 +155,6 @@ export default function InvitationBuilder({ eventId, event }: Props) {
     }
   };
 
-  const handlePreview = () => {
-    if (!invitationUrl) return;
-    window.open(invitationUrl, '_blank', 'noopener,noreferrer');
-  };
-
-  const currentImage = backgroundPreview || (backgroundImage ? designLink(backgroundImage) : null);
-  const previewSurface = `${backgroundClasses[backgroundColor]} ${currentImage ? 'bg-white/75' : ''}`;
-  const previewText = textClasses[textColor];
-  const headingFont = headingStyle === 'serif' ? 'font-serif' : 'font-sans';
-
   return (
     <div className="space-y-6">
       <header>
@@ -185,51 +176,44 @@ export default function InvitationBuilder({ eventId, event }: Props) {
               </div>
             </div>
 
+            <InvitationBackgroundSelector value={backgroundTemplate} onChange={setBackgroundTemplate} />
+            <InvitationEnvelopeSelector value={envelope} onChange={setEnvelope} />
+
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="space-y-2 text-sm font-medium text-[#351018]">
+              <label className="space-y-2 text-base font-semibold text-[#351018]">
                 Background
-                <select value={backgroundColor} onChange={(event) => handleBackgroundColor(event.target.value as InvitationBackground)} className="w-full rounded-xl border border-[#351018]/15 bg-white px-3 py-3 outline-none focus:ring-2 focus:ring-[#D9A3AA]">
-                  <option value="cream">Warm cream</option><option value="blush">Blush pink</option><option value="white">White</option><option value="burgundy">Burgundy</option>
+                <select value={backgroundColor} onChange={(event) => handleBackgroundColor(event.target.value as InvitationBackground)} className="w-full rounded-xl border border-[#351018]/15 bg-white px-3 py-3 text-sm font-normal outline-none focus:ring-2 focus:ring-[#D9A3AA]">
+                  <option value="dustyRose">Dusty rose</option><option value="cream">Warm cream</option><option value="blush">Blush pink</option><option value="white">White</option><option value="burgundy">Burgundy</option>
                 </select>
               </label>
-              <label className="space-y-2 text-sm font-medium text-[#351018]">
+              <label className="space-y-2 text-base font-semibold text-[#351018]">
                 Text color
-                <select value={textColor} onChange={(event) => setTextColor(event.target.value as InvitationTextColor)} className="w-full rounded-xl border border-[#351018]/15 bg-white px-3 py-3 outline-none focus:ring-2 focus:ring-[#D9A3AA]">
+                <select value={textColor} onChange={(event) => setTextColor(event.target.value as InvitationTextColor)} className="w-full rounded-xl border border-[#351018]/15 bg-white px-3 py-3 text-sm font-normal outline-none focus:ring-2 focus:ring-[#D9A3AA]">
                   <option value="burgundy">Burgundy</option><option value="dustyRose">Dusty rose</option><option value="white">White</option>
+                  <option value="black">Black</option>
                 </select>
               </label>
             </div>
 
-            <label className="block space-y-2 text-sm font-medium text-[#351018]">
+            <label className="block space-y-2 text-base font-semibold text-[#351018]">
               Heading style
-              <select value={headingStyle} onChange={(event) => setHeadingStyle(event.target.value as InvitationHeadingStyle)} className="w-full rounded-xl border border-[#351018]/15 bg-white px-3 py-3 outline-none focus:ring-2 focus:ring-[#D9A3AA]">
+              <select value={headingStyle} onChange={(event) => setHeadingStyle(event.target.value as InvitationHeadingStyle)} className="w-full rounded-xl border border-[#351018]/15 bg-white px-3 py-3 text-sm font-normal outline-none focus:ring-2 focus:ring-[#D9A3AA]">
                 <option value="serif">Elegant serif</option><option value="sans">Modern sans</option>
               </select>
             </label>
 
-            <label className="block space-y-2 text-sm font-medium text-[#351018]">
+            <label className="block space-y-2 text-base font-semibold text-[#351018]">
               Invitation title
-              <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} placeholder={event.title} className="w-full rounded-xl border border-[#351018]/15 px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-[#D9A3AA]" />
+              <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} placeholder={event.title} className="w-full rounded-xl border border-[#351018]/15 px-4 py-3 text-sm font-normal outline-none focus:ring-2 focus:ring-[#D9A3AA]" />
             </label>
 
-            <label className="block space-y-2 text-sm font-medium text-[#351018]">
+            <label className="block space-y-2 text-base font-semibold text-[#351018]">
               Invitation message
-              <textarea value={message} onChange={(event) => setMessage(event.target.value)} maxLength={1500} rows={4} placeholder="Write a warm message for your guests..." className="w-full resize-y rounded-xl border border-[#351018]/15 px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-[#D9A3AA]" />
+              <textarea value={message} onChange={(event) => setMessage(event.target.value)} maxLength={1500} rows={4} placeholder="Write a warm message for your guests..." className="w-full resize-y rounded-xl border border-[#351018]/15 px-4 py-3 text-sm font-normal outline-none focus:ring-2 focus:ring-[#D9A3AA]" />
             </label>
 
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-[#351018]">Optional background photo</p>
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#351018]/15 px-4 py-3 text-sm text-[#351018] hover:bg-[#F2D9DC]/40">
-                <Upload size={16} /> {backgroundFile ? backgroundFile.name : 'Choose photo'}
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="sr-only" />
-              </label>
-              {(backgroundPreview || backgroundImage) && (
-                <button type="button" onClick={() => { setBackgroundImage(null); setBackgroundFile(null); if (backgroundPreview) URL.revokeObjectURL(backgroundPreview); setBackgroundPreview(null); }} className="ml-3 inline-flex items-center gap-1 text-sm text-[#351018]/70">
-                  <X size={15} /> Remove photo
-                </button>
-              )}
-              <p className="text-xs text-[#351018]/50">JPG, PNG or WEBP. Maximum 5 MB.</p>
-            </div>
+            <InvitationPhotoUpload fileName={backgroundFile?.name} hasImage={Boolean(backgroundPreview || backgroundImage)}
+              onChange={handleImageChange} onRemove={removePhoto} />
 
             <label className="flex items-center gap-3 text-sm text-[#351018]">
               <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} className="h-4 w-4 accent-[#351018]" />
@@ -243,7 +227,7 @@ export default function InvitationBuilder({ eventId, event }: Props) {
               <button type="button" onClick={handleSave} disabled={isSaving || isUploading} className="inline-flex items-center gap-2 rounded-xl bg-[#351018] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#D9A3AA] hover:text-[#351018] disabled:opacity-50">
                 <Send size={16} /> {isSaving || isUploading ? 'Saving...' : 'Save Design'}
               </button>
-              <button type="button" onClick={handlePreview} disabled={!invitationUrl} className="inline-flex items-center gap-2 rounded-xl border border-[#351018]/20 px-4 py-3 text-sm text-[#351018] disabled:opacity-40">
+              <button type="button" onClick={() => window.open(invitationUrl, '_blank', 'noopener,noreferrer')} disabled={!invitationUrl} className="inline-flex items-center gap-2 rounded-xl border border-[#351018]/20 px-4 py-3 text-sm text-[#351018] disabled:opacity-40">
                 <Eye size={16} /> Public Preview
               </button>
               <button type="button" onClick={handleCopy} disabled={!invitationUrl} className="inline-flex items-center gap-2 rounded-xl border border-[#351018]/20 px-4 py-3 text-sm text-[#351018] disabled:opacity-40">
@@ -254,23 +238,9 @@ export default function InvitationBuilder({ eventId, event }: Props) {
           </section>
         </div>
 
-        <section className="space-y-3 lg:sticky lg:top-6">
-          <h3 className="text-sm font-semibold text-[#351018]">Live Preview</h3>
-          <div className={`relative isolate min-h-[520px] overflow-hidden rounded-3xl border p-7 shadow-sm sm:p-10 ${template === 'romantic' ? 'border-[#D9A3AA]/70' : template === 'classic' ? 'border-[#D9A3AA]/40' : 'border-[#351018]/10'} ${previewSurface}`}>
-            {currentImage && <img src={currentImage} alt="" aria-hidden="true" className="absolute inset-0 z-0 h-full w-full object-cover" />}
-            {currentImage && <div className="absolute inset-0 z-0 bg-white/70" />}
-            <div className={`relative z-10 mx-auto flex min-h-[450px] max-w-lg flex-col items-center justify-center text-center ${previewText}`}>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] opacity-60">You're Invited</p>
-              <div className="my-6 h-px w-16 bg-[#D9A3AA]" />
-              <h2 className={`text-3xl font-semibold sm:text-4xl ${headingFont}`}>{title.trim() || event.title}</h2>
-              <p className="mt-5 max-w-sm whitespace-pre-line text-sm leading-7 opacity-80">{message.trim() || 'Join us for a special celebration.'}</p>
-              <div className="my-8 h-px w-full bg-[#351018]/15" />
-              <p className="text-sm font-medium">{new Date(event.date).toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'short' })}</p>
-              <p className="mt-2 text-sm opacity-75">{[event.city, event.address].filter(Boolean).join(', ')}</p>
-              <p className="mt-8 text-xs uppercase tracking-[0.2em] opacity-50">YourEvent</p>
-            </div>
-          </div>
-        </section>
+        <InvitationPreview event={event} template={template} backgroundColor={backgroundColor}
+          textColor={textColor} headingStyle={headingStyle} title={title} message={message}
+          backgroundImage={backgroundImage} backgroundPreview={backgroundPreview} backgroundTemplate={backgroundTemplate} />
       </div>
     </div>
   );

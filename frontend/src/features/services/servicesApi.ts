@@ -19,6 +19,7 @@ export interface Service {
 }
 
 export interface ServiceFilters {
+  providerId?: number;
   search?: string;
   city?: string;
   category?: string;
@@ -34,6 +35,7 @@ const servicesApi = api.injectEndpoints({
       ServiceFilters
     >({
       query: (params) => ({ url: '/services', params }),
+      providesTags: ['Services', 'Providers'],
     }),
 
     getService: builder.query<Service, number>({

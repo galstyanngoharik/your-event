@@ -1,0 +1,90 @@
+@import './surfaces.css';
+@import './controls.css';
+@import './navigation.css';
+@import './motion.css';
+
+:root {
+  --ye-ink: #351018;
+  --ye-muted: #80686c;
+  --ye-page: #fff8f1;
+  --ye-surface: #fffdfb;
+  --ye-soft: #f7edef;
+  --ye-border: #e9d8d8;
+  --ye-rose: #d9a3aa;
+  --ye-shadow: 0 4px 7px -6px #35101818, 0 14px 40px -26px #35101835;
+  --ye-focus: #a86f79;
+}
+
+:root[data-theme='dark'][data-theme-scope='app'] {
+  --ye-ink: #f8eff1;
+  --ye-muted: #c3b1b7;
+  --ye-page: #141113;
+  --ye-surface: #211b1f;
+  --ye-soft: #30242b;
+  --ye-border: #49343e;
+  --ye-shadow: 0 8px 28px -12px #0008;
+  --ye-focus: #d9a3aa;
+}
+
+.ye-ui {
+  font-family: var(--font-sans);
+  color: var(--ye-ink);
+  accent-color: var(--ye-focus);
+}
+
+.ye-ui :where(h1, h2, h3, h4, p, a, button):not([data-theme-preserve], [data-theme-preserve] *) {
+  overflow-wrap: anywhere;
+}
+
+.ye-ui :where(h1, h2):not([data-theme-preserve], [data-theme-preserve] *) {
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.ye-page > :first-child > :first-child :where(h1, h2):not([data-theme-preserve], [data-theme-preserve] *),
+.ye-auth h1 {
+  font-family: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
+  font-weight: 500;
+}
+
+.ye-page {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  min-width: 0;
+}
+
+.ye-shell {
+  height: 100svh;
+  background: var(--ye-page);
+}
+
+.ye-main {
+  background: radial-gradient(ellipse at 100% 0, #d9a3aa12, transparent 55%), var(--ye-page);
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+
+.ye-auth {
+  background: radial-gradient(ellipse at 5% 0, #d9a3aa25, transparent 55%), var(--ye-page);
+  padding-block: clamp(1.5rem, 5vh, 4rem);
+}
+
+.ye-auth > div {
+  padding: clamp(1.25rem, 4vw, 2.75rem);
+  border: 1px solid var(--ye-border);
+  border-radius: 1.75rem;
+  background: var(--ye-surface);
+  box-shadow: var(--ye-shadow);
+}
+
+.ye-landing {
+  background: radial-gradient(ellipse at 50% 0, #d9a3aa1f, transparent 35%), var(--ye-page);
+}
+
+@media (max-width: 639px) {
+  .ye-main { padding: 1rem; }
+  .ye-auth { padding-inline: 1rem; }
+}
+
+.ye-page > div[class~='bg-[#F8F3EF]'] { padding: 0; background: transparent; }

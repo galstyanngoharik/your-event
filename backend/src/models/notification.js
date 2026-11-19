@@ -1,0 +1,10 @@
+module.exports=(db,D)=>db.define('Notification',{
+  id:{type:D.INTEGER,primaryKey:true,autoIncrement:true},
+  type:{type:D.STRING(40),allowNull:false},
+  title:{type:D.STRING(160),allowNull:false},
+  description:{type:D.STRING(500),allowNull:false},
+  entityId:{type:D.INTEGER,allowNull:true},
+  link:{type:D.STRING(300),allowNull:false},
+  readAt:{type:D.DATE,allowNull:true},
+  dedupeKey:{type:D.STRING(200),allowNull:false,unique:true},
+},{indexes:[{fields:['recipientId','createdAt']}]});

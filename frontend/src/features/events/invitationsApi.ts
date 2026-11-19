@@ -1,9 +1,11 @@
+import type { InvitationEnvelopeId } from './invitationEnvelopes';
+import type { InvitationBackgroundTemplate } from './invitationBackgrounds';
 import { api } from '../../services/api';
 
 export type InvitationTheme = 'classic' | 'soft' | 'dark';
 export type InvitationTemplate = 'romantic' | 'classic' | 'modern';
-export type InvitationBackground = 'cream' | 'blush' | 'white' | 'burgundy';
-export type InvitationTextColor = 'burgundy' | 'white' | 'dustyRose';
+export type InvitationBackground = 'cream' | 'blush' | 'white' | 'burgundy' | 'dustyRose';
+export type InvitationTextColor = 'burgundy' | 'white' | 'dustyRose' | 'black';
 export type InvitationHeadingStyle = 'serif' | 'sans';
 
 export interface Invitation {
@@ -19,6 +21,8 @@ export interface Invitation {
   textColor: InvitationTextColor;
   headingStyle: InvitationHeadingStyle;
   backgroundImage: string | null;
+  backgroundTemplate?: InvitationBackgroundTemplate | null;
+  envelope?: InvitationEnvelopeId | null;
 }
 
 export interface SaveInvitationPayload {
@@ -28,6 +32,8 @@ export interface SaveInvitationPayload {
   message: string;
   published: boolean;
   backgroundImage?: string | null;
+  backgroundTemplate?: InvitationBackgroundTemplate | null;
+  envelope?: InvitationEnvelopeId | null;
   template?: InvitationTemplate;
   backgroundColor?: InvitationBackground;
   textColor?: InvitationTextColor;
@@ -47,6 +53,8 @@ export interface PublicInvitation {
     published: boolean;
     token: string;
     backgroundImage: string | null;
+    backgroundTemplate?: InvitationBackgroundTemplate | null;
+    envelope?: InvitationEnvelopeId | null;
     template: InvitationTemplate;
     backgroundColor: InvitationBackground;
     textColor: InvitationTextColor;

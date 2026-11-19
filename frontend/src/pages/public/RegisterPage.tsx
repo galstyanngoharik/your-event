@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 
 import { useRegisterMutation } from '../../features/auth/authApi';
 import type { Role } from '../../types/auth';
@@ -34,12 +35,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-white px-6 py-12">
+    <main className="ye-ui ye-auth flex min-h-screen items-center justify-center bg-[#FFF8F1] px-6 py-12">
       <div className="w-full max-w-md">
         <Link
           to="/"
-          className="mb-10 block text-center text-3xl font-bold text-[#351018]"
+          className="mb-10 flex items-center justify-center gap-2 text-3xl font-bold text-[#351018]"
         >
+          <Heart size={28} fill="none" aria-hidden="true" className="shrink-0 text-[#351018]" />
           YourEvent.
         </Link>
 

@@ -1,32 +1,48 @@
-# React + TypeScript + Vite
+# YourEvent — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+The frontend of **YourEvent** is a responsive event-planning application built with React and TypeScript.
 
-Currently, two official plugins are available:
+It provides interfaces for event organizers and service providers, allowing users to manage events, explore services, communicate, and organize event-related activities.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Technologies Used
 
-## React Compiler
+| Technology | Purpose |
+|---|---|
+| React | Building reusable user interface components |
+| TypeScript | Static typing and improved code reliability |
+| Vite | Fast development server and production builds |
+| Tailwind CSS | Responsive styling and consistent design |
+| Redux Toolkit | Managing application state |
+| RTK Query | API requests, caching, and server-state management |
+| React Router | Client-side routing and navigation |
+| Lucide React | Interface icons |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting Started
 
-## Expanding the Oxlint configuration
+Install dependencies:
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+## Environment Configuration
+
+Create a `.env` file inside the `frontend` directory:
+
+```env
+VITE_API_URL=http://localhost:3000/api
+```
+
+Ensure the backend server is running before using features that require API access.

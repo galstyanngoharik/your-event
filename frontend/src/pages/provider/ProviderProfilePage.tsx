@@ -1,6 +1,9 @@
+import ProviderContactFields from '../../features/profile/ProviderContactFields';
+import ProviderProfileAvatar from '../../features/profile/ProviderProfileAvatar';
+import ThemeToggle from '../../features/theme/ThemeToggle';
 
 import { useEffect, useState } from 'react';
-import { Camera, Save, Trash2, UserRound } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { useAppDispatch } from '../../app/hooks';
 import { setUser } from '../../features/auth/authSlice';
 import { useGetMeQuery } from '../../features/auth/authApi';
@@ -9,17 +12,6 @@ import {
   useUploadProviderAvatarMutation,
 } from '../../features/profile/providersApi';
 import PortfolioManager from '../../features/profile/PortfolioManager';
-
-const getImageUrl = (path: string | null) => {
-  if (!path) return null;
-  if (path.startsWith('http')) return path;
-
-  const base = (
-    import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
-  ).replace(/\/api\/?$/, '');
-
-  return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
-};
 
 export default function ProviderProfilePage() {
   const dispatch = useAppDispatch();
@@ -137,6 +129,7 @@ export default function ProviderProfilePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-[#351018]">
             Provider Profile
@@ -145,73 +138,15 @@ export default function ProviderProfilePage() {
             Manage your business information.
           </p>
         </div>
+        <ThemeToggle />
+      </div>
 
         <form
           onSubmit={handleSave}
           className="space-y-6 rounded-2xl border border-[#D9A3AA]/40 bg-white p-6 shadow-sm sm:p-8"
         >
-          <div className="flex flex-col items-center gap-5 border-b pb-6 sm:flex-row">
-            <div className="relative">
-              {getImageUrl(avatar) ? (
-                <img
-                  src={getImageUrl(avatar)!}
-                  alt="Provider avatar"
-                  className="h-28 w-28 rounded-full object-cover"
-                />
-              ) : (
-                <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#351018]/10">
-                  <UserRound size={44} className="text-[#351018]" />
-                </div>
-              )}
-
-              <label
-                htmlFor="provider-avatar"
-                className="absolute bottom-0 right-0 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#351018] text-white"
-              >
-                <Camera size={17} />
-              </label>
-
-              <input
-                id="provider-avatar"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleAvatarChange}
-                disabled={isUploading || isSaving}
-                className="hidden"
-              />
-            </div>
-
-            <div className="space-y-2 text-center sm:text-left">
-              <h2 className="text-lg font-semibold text-[#351018]">
-                {user.name}
-              </h2>
-
-              <p className="text-sm text-gray-500">
-                Service Provider
-              </p>
-
-              <p className="text-xs text-gray-400">
-                JPG, PNG or WEBP. Maximum 5 MB.
-              </p>
-
-              {avatar && (
-                <button
-                  type="button"
-                  onClick={() => setAvatar(null)}
-                  className="inline-flex items-center gap-1 text-xs text-red-600"
-                >
-                  <Trash2 size={14} />
-                  Remove photo
-                </button>
-              )}
-
-              {isUploading && (
-                <p className="text-xs text-gray-500">
-                  Uploading photo...
-                </p>
-              )}
-            </div>
-          </div>
+        <ProviderProfileAvatar avatar={avatar} displayName={user.name} isUploading={isUploading}
+          isSaving={isSaving} handleAvatarChange={handleAvatarChange} setAvatar={setAvatar} />
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-[#351018]">
@@ -257,7 +192,7 @@ export default function ProviderProfilePage() {
             <input
               value={cities}
               onChange={(e) => setCities(e.target.value)}
-              placeholder="Yerevan, Gyumri, Vanadzor"
+              placeholder="New York"
               className="w-full rounded-xl border border-[#351018]/15 px-4 py-3 outline-none focus:ring-2 focus:ring-[#D9A3AA]"
             />
             <p className="text-xs text-gray-400">
@@ -265,33 +200,8 @@ export default function ProviderProfilePage() {
             </p>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#351018]">
-              Instagram
-            </label>
-            <input
-              type="url"
-              value={instagram}
-              onChange={(e) => setInstagram(e.target.value)}
-              maxLength={255}
-              placeholder="https://www.instagram.com/username/ or @username"
-              className="w-full rounded-xl border border-[#351018]/15 px-4 py-3 outline-none focus:ring-2 focus:ring-[#D9A3AA]"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#351018]">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              maxLength={32}
-              placeholder="+374 91 123456"
-              className="w-full rounded-xl border border-[#351018]/15 px-4 py-3 outline-none focus:ring-2 focus:ring-[#D9A3AA]"
-            />
-          </div>
+          <ProviderContactFields instagram={instagram} phoneNumber={phoneNumber}
+            setInstagram={setInstagram} setPhoneNumber={setPhoneNumber} />
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-[#351018]">

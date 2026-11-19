@@ -1,4 +1,8 @@
 import { api } from '../../services/api';
+import type { CurrencyCode } from './currency';
+import type { Task } from './tasksApi';
+import type { Expense } from './expensesApi';
+import type { Guest } from './guestsApi';
 import type { Invitation } from './invitationsApi';
 
 export type EventStatus = 'planning' | 'completed' | 'cancelled';
@@ -12,10 +16,17 @@ export interface Event {
   city: string;
   address: string;
   budget: number;
+  currency: CurrencyCode;
   expectedGuests: number;
   coverImage: string | null;
   status: EventStatus;
   invitation?: Invitation | null;
+}
+
+export interface AnalyticsEvent extends Event {
+  tasks: Task[];
+  expenses: Expense[];
+  guests: Guest[];
 }
 
 export type EventPayload = Pick<
@@ -27,12 +38,17 @@ export type EventPayload = Pick<
   | 'city'
   | 'address'
   | 'budget'
+  | 'currency'
   | 'expectedGuests'
   | 'status'
 >;
 
 export const eventsApi = api.injectEndpoints({
   endpoints: (builder) => ({
+    getDashboardEvents: builder.query<AnalyticsEvent[], void>({
+      query: () => '/events?analytics=true',
+      providesTags: ['Events', 'Tasks', 'Expenses', 'Guests'],
+    }),
     getEvents: builder.query<Event[], void>({
       query: () => '/events',
       providesTags: ['Events'],
@@ -75,6 +91,7 @@ export const eventsApi = api.injectEndpoints({
 });
 
 export const {
+  useGetDashboardEventsQuery,
   useGetEventsQuery,
   useGetEventByIdQuery,
   useCreateEventMutation,

@@ -1,5 +1,7 @@
+import EventBudgetFields from './EventBudgetFields';
+import { currencyCode } from '../currency';
 import { useState, type FormEvent } from 'react';
-import { CalendarDays, MapPin, Wallet, Users } from 'lucide-react';
+import { CalendarDays, MapPin, Users } from 'lucide-react';
 
 import type { EventPayload } from '../eventsApi';
 
@@ -18,6 +20,7 @@ const emptyValues: EventPayload = {
   city: '',
   address: '',
   budget: 0,
+  currency: 'AMD',
   expectedGuests: 0,
   status: 'planning',
 };
@@ -176,24 +179,11 @@ export default function EventForm({
           Planning Details
         </h2>
 
-        <div className="grid gap-5 md:grid-cols-2">
-          <div>
-            <label className={labelClass}>
-              <span className="flex items-center gap-2">
-                <Wallet size={16} />
-                Total Budget (AMD)
-              </span>
-            </label>
-            <input
-              type="number"
-              min="0"
-              className={inputClass}
-              value={form.budget}
-              onChange={(e) =>
-                handleChange('budget', Number(e.target.value))
-              }
-            />
-          </div>
+        <div className="grid gap-5 md:grid-cols-3">
+          <EventBudgetFields budget={form.budget} currency={currencyCode(form.currency)}
+            setBudget={value => handleChange('budget', value)}
+            setCurrency={value => handleChange('currency', value)}
+            inputClass={inputClass} labelClass={labelClass} />
 
           <div>
             <label className={labelClass}>
@@ -213,6 +203,9 @@ export default function EventForm({
             />
           </div>
         </div>
+        <p className="mt-4 text-xs text-[#351018]/60">
+          Budget and expenses use this currency. Changing it does not convert existing amounts.
+        </p>
       </div>
 
       {error && (
