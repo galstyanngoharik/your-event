@@ -78,7 +78,7 @@ export default function LandingRoles({ openImage }: { openImage: (source: string
               </p>
 
               <Link
-                to="/register"
+                to="/register?role=provider"
                 className="mt-7 inline-flex items-center gap-2 rounded-full border border-[#351018] px-6 py-3 text-sm transition-all duration-300 hover:bg-[#351018] hover:text-white"
               >
                 Join as a Provider <ArrowRight size={17} />
