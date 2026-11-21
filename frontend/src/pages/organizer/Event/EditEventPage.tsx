@@ -48,7 +48,7 @@ export default function EditEventPage() {
     title: event.title,
     type: event.type,
     description: event.description ?? '',
-    date: event.date.slice(0, 16),
+    date: event.date,
     city: event.city,
     address: event.address ?? '',
     budget: Number(event.budget ?? 0),

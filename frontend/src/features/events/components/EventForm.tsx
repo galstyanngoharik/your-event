@@ -1,8 +1,9 @@
-import EventBudgetFields from './EventBudgetFields';
-import { currencyCode } from '../currency';
+
 import { useState, type FormEvent } from 'react';
 import { CalendarDays, MapPin, Users } from 'lucide-react';
 
+import EventBudgetFields from './EventBudgetFields';
+import { currencyCode } from '../currency';
 import type { EventPayload } from '../eventsApi';
 
 interface EventFormProps {
@@ -28,7 +29,22 @@ const emptyValues: EventPayload = {
 const inputClass =
   'w-full rounded-xl border border-[#351018]/15 bg-white px-4 py-3 text-sm text-[#351018] outline-none transition focus:border-[#351018]';
 
-const labelClass = 'mb-2 block text-sm font-medium text-[#351018]';
+const labelClass =
+  'mb-2 block text-sm font-medium text-[#351018]';
+
+const toLocalDateTime = (value: string): string => {
+  if (!value) return '';
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return '';
+
+  const local = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000
+  );
+
+  return local.toISOString().slice(0, 16);
+};
 
 export default function EventForm({
   initialValues = emptyValues,
@@ -37,45 +53,75 @@ export default function EventForm({
   submitLabel = 'Save Event',
 }: EventFormProps) {
   const [form, setForm] = useState<EventPayload>(initialValues);
+
+  const [budget, setBudget] = useState<string>(
+    initialValues.budget === 0
+      ? ''
+      : String(initialValues.budget)
+  );
+
+  const [date, setDate] = useState<string>(() =>
+    toLocalDateTime(initialValues.date)
+  );
+
   const [error, setError] = useState('');
 
   const handleChange = <K extends keyof EventPayload>(
     field: K,
     value: EventPayload[K]
   ) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
-    if (!form.title.trim() || !form.date || !form.city.trim()) {
-        setError('Please fill in all required fields.');
-        return;
+
+    if (!form.title.trim() || !date || !form.city.trim()) {
+      setError('Please fill in all required fields.');
+      return;
     }
 
+    const budgetNumber = budget.trim() === '' ? 0 : Number(budget);
+    const guestsNumber = Number(form.expectedGuests);
+    const selectedDate = new Date(date);
+
     if (
-        !Number.isFinite(Number(form.budget)) ||
-        !Number.isFinite(Number(form.expectedGuests)) ||
-        Number(form.budget) < 0 ||
-        Number(form.expectedGuests) < 0
+      !Number.isFinite(budgetNumber) ||
+      budgetNumber < 0 ||
+      !Number.isFinite(guestsNumber) ||
+      !Number.isInteger(guestsNumber) ||
+      guestsNumber < 0
     ) {
-        setError('Budget and expected guests cannot be negative.');
-        return;
+      setError('Please enter a valid budget and guest count.');
+      return;
     }
+
+    if (Number.isNaN(selectedDate.getTime())) {
+      setError('Please select a valid date and time.');
+      return;
+    }
+
+    const payload: EventPayload = {
+      ...form,
+      budget: budgetNumber,
+      expectedGuests: guestsNumber,
+      date: selectedDate.toISOString(),
+    };
+
     try {
-        await onSubmit(form);
+      await onSubmit(payload);
     } catch (err) {
-        console.log(err);
-        setError('Failed to save event. Please try again.');
+      console.error(err);
+      setError('Failed to save event. Please try again.');
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="mx-auto max-w-4xl space-y-8"
-    >
+    <form onSubmit={handleSubmit} className="mx-auto max-w-4xl space-y-8">
       <div className="rounded-2xl border border-[#351018]/10 bg-white p-6 md:p-8">
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-[#351018]">
@@ -109,9 +155,6 @@ export default function EventForm({
               <option value="wedding">Wedding</option>
               <option value="corporate">Corporate Event</option>
               <option value="party">Private Party</option>
-              <option value="party">Graduation Party</option>
-              <option value="party">HouseWarming</option>
-              <option value="party">Team-building event</option>
               <option value="other">Other</option>
             </select>
           </div>
@@ -129,17 +172,20 @@ export default function EventForm({
           </div>
 
           <div>
-            <label className={labelClass}>
+            <label htmlFor="event-date" className={labelClass}>
               <span className="flex items-center gap-2">
                 <CalendarDays size={16} />
                 Date & Time *
               </span>
             </label>
+
             <input
+              id="event-date"
               type="datetime-local"
+              step="60"
               className={inputClass}
-              value={form.date}
-              onChange={(e) => handleChange('date', e.target.value)}
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
               required
             />
           </div>
@@ -180,10 +226,14 @@ export default function EventForm({
         </h2>
 
         <div className="grid gap-5 md:grid-cols-3">
-          <EventBudgetFields budget={form.budget} currency={currencyCode(form.currency)}
-            setBudget={value => handleChange('budget', value)}
-            setCurrency={value => handleChange('currency', value)}
-            inputClass={inputClass} labelClass={labelClass} />
+          <EventBudgetFields
+            budget={budget}
+            currency={currencyCode(form.currency)}
+            setBudget={setBudget}
+            setCurrency={(value) => handleChange('currency', value)}
+            inputClass={inputClass}
+            labelClass={labelClass}
+          />
 
           <div>
             <label className={labelClass}>
@@ -195,6 +245,7 @@ export default function EventForm({
             <input
               type="number"
               min="0"
+              step="1"
               className={inputClass}
               value={form.expectedGuests}
               onChange={(e) =>
@@ -203,8 +254,10 @@ export default function EventForm({
             />
           </div>
         </div>
+
         <p className="mt-4 text-xs text-[#351018]/60">
-          Budget and expenses use this currency. Changing it does not convert existing amounts.
+          Budget and expenses use this currency. Changing it does not
+          convert existing amounts.
         </p>
       </div>
 
